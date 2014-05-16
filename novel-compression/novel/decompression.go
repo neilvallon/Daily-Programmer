@@ -8,9 +8,19 @@ import (
 func Decompress(in string) (str string, err error) {
 	d := &decompressor{data: in}
 
-	_, err = d.readInt()
+	i, err := d.readInt()
 	if err != nil {
 		return
+	}
+
+	d.dictionary = make([]string, i)
+	for j := 0; j < i; j++ {
+		d.ignoreWhitespace()
+
+		d.dictionary[j], err = d.readWord()
+		if err != nil {
+			return
+		}
 	}
 
 	return
@@ -20,6 +30,8 @@ type decompressor struct {
 	data  string
 	start int
 	pos   int
+
+	dictionary []string
 }
 
 func (d *decompressor) next() (b byte) {
@@ -48,5 +60,25 @@ func (d *decompressor) readInt() (i int, err error) {
 		d.start = d.pos
 	}
 
+	return
+}
+
+func (d *decompressor) readWord() (str string, err error) {
+	for b := d.next(); 'a' <= b && b <= 'z'; b = d.next() {
+	}
+	d.back()
+
+	str = d.data[d.start:d.pos]
+	if str == "" {
+		err = fmt.Errorf("Could not read String at position: %d", d.start)
+	}
+	return
+}
+
+func (d *decompressor) ignoreWhitespace() {
+	for b := d.next(); b == ' ' || b == '\n' || b == '\t'; b = d.next() {
+	}
+	d.back()
+	d.start = d.pos
 	return
 }
