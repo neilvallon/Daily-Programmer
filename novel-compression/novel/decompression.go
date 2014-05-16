@@ -1,8 +1,10 @@
 package novel
 
 import (
+	"bytes"
 	"fmt"
 	"strconv"
+	"strings"
 )
 
 func Decompress(in string) (str string, err error) {
@@ -23,7 +25,7 @@ func Decompress(in string) (str string, err error) {
 		}
 	}
 
-	return
+	return d.decode()
 }
 
 type decompressor struct {
@@ -32,6 +34,37 @@ type decompressor struct {
 	pos   int
 
 	dictionary []string
+}
+
+func (d *decompressor) decode() (str string, err error) {
+	sbuff := bytes.NewBufferString("")
+
+	for {
+		d.ignoreWhitespace()
+		switch b := d.next(); {
+		case b == 'E' || b == 'e':
+			return sbuff.String(), nil
+		case b == 'R' || b == 'r':
+			sbuff.WriteByte('\n')
+		case '0' <= b && b <= '9':
+			d.back()
+			i, _ := d.readInt()
+			word := d.dictionary[i]
+			switch d.next() {
+			case '^':
+				word = strings.Title(word)
+			case '!':
+				word = strings.ToUpper(word)
+			default:
+				d.back()
+			}
+			sbuff.WriteString(word + " ")
+		default:
+			fmt.Printf("Skipping byte: %q\n", b)
+		}
+	}
+
+	return
 }
 
 func (d *decompressor) next() (b byte) {
