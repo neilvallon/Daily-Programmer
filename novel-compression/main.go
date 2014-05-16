@@ -3,6 +3,9 @@ package main
 import (
 	"flag"
 	"fmt"
+	"io/ioutil"
+
+	"github.com/NeilVallon/dailyProgrammer/novel-compression/novel"
 )
 
 func main() {
@@ -32,6 +35,24 @@ func main() {
 	case *comp:
 		panic("Compression not implemented")
 	case *decomp:
-		panic("Decompression not implemented")
+		err := decompress(flag.Arg(0), flag.Arg(1))
+		if err != nil {
+			fmt.Println(err)
+		}
 	}
+}
+
+func decompress(inf string, outf string) (err error) {
+	cd, err := ioutil.ReadFile(inf)
+	if err != nil {
+		return
+	}
+
+	data, err := novel.Decompress(string(cd))
+	if err != nil {
+		return
+	}
+
+	err = ioutil.WriteFile(outf, []byte(data), 0755)
+	return
 }
