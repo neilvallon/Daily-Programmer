@@ -59,7 +59,7 @@ func (c *compressor) encode() (str string, err error) {
 			archbuff.WriteByte(' ')
 			archbuff.WriteByte(b)
 			lastword = false
-		case '.', ',', '?', ';', ':':
+		case '.', ',', '?', ';', ':', '-':
 			archbuff.WriteByte(b)
 			lastword = false
 		case '\x00':
