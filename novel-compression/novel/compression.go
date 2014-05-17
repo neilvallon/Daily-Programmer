@@ -53,7 +53,10 @@ func (c *compressor) encode() (str string, err error) {
 		switch b := c.next(); b {
 		case '\n':
 			archbuff.WriteString("R\n")
-		case '.', ',', '?', '!', ';', ':':
+		case '!':
+			archbuff.WriteByte(' ')
+			archbuff.WriteByte(b)
+		case '.', ',', '?', ';', ':':
 			archbuff.WriteByte(b)
 		case '\x00':
 			return c.String() + "\n" + archbuff.String() + "E", nil
