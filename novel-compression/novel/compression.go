@@ -35,6 +35,12 @@ type compressor struct {
 	pos   int
 }
 
+const (
+	LOWER = iota
+	FIRST
+	UPPER
+)
+
 func (c *compressor) String() string {
 	return strconv.Itoa(c.dictSize) + "\n" + c.dict.String()
 }
@@ -53,12 +59,22 @@ func (c *compressor) encode() (str string, err error) {
 			return c.String() + "\n" + archbuff.String() + "E", nil
 		default:
 			c.back()
-			w, err := c.readWord()
+			w, lc, err := c.readWord()
 			if err != nil {
 				return "", err
 			}
-			i := c.addWord(w)
-			archbuff.WriteString(strconv.Itoa(i) + " ")
+
+			i := c.addWord(strings.ToLower(w))
+			archbuff.WriteString(strconv.Itoa(i))
+
+			switch lc {
+			case FIRST:
+				archbuff.WriteByte('^')
+			case UPPER:
+				archbuff.WriteByte('!')
+			default:
+				archbuff.WriteByte(' ')
+			}
 		}
 	}
 }
@@ -94,10 +110,24 @@ func (c *compressor) ignoreWhitespace() {
 	return
 }
 
-func (c *compressor) readWord() (str string, err error) {
-	for b := c.next(); 'a' <= b && b <= 'z' || 'A' <= b && b <= 'Z'; b = c.next() {
+func (c *compressor) readWord() (str string, lcase int, err error) {
+	if b := c.next(); 'A' <= b && b <= 'Z' {
+		lcase = UPPER
 	}
-	c.back()
+
+LOOP:
+	for {
+		switch b := c.next(); {
+		case 'A' <= b && b <= 'Z':
+		case 'a' <= b && b <= 'z':
+			if lcase == UPPER {
+				lcase = FIRST
+			}
+		default:
+			c.back()
+			break LOOP
+		}
+	}
 
 	str = c.data[c.start:c.pos]
 	if str == "" {
