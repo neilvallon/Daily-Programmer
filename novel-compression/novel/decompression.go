@@ -65,7 +65,7 @@ func (d *decompressor) decode() (str string, err error) {
 			}
 			sbuff.WriteString(word + d.nextSeparator())
 		default:
-			fmt.Printf("Skipping byte: %q\n", b)
+			return "", fmt.Errorf("Encountered unrecognized byte: %q", b)
 		}
 	}
 
