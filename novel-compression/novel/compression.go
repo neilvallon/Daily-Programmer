@@ -14,7 +14,7 @@ func (d dictionary) String() string {
 	for k, v := range d {
 		sarr[v] = k
 	}
-	return strings.Join(sarr, " ")
+	return strings.Join(sarr, "\n")
 }
 
 func Compress(in string) (str string, err error) {
@@ -36,7 +36,7 @@ type compressor struct {
 }
 
 func (c *compressor) String() string {
-	return strconv.Itoa(c.dictSize) + c.dict.String()
+	return strconv.Itoa(c.dictSize) + "\n" + c.dict.String()
 }
 
 func (c *compressor) encode() (str string, err error) {
