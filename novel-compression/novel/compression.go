@@ -4,24 +4,39 @@ import (
 	"bytes"
 	"fmt"
 	"strconv"
+	"strings"
 )
+
+type dictionary map[string]int
+
+func (d dictionary) String() string {
+	sarr := make([]string, len(d))
+	for k, v := range d {
+		sarr[v] = k
+	}
+	return strings.Join(sarr, " ")
+}
 
 func Compress(in string) (str string, err error) {
 	c := &compressor{
 		data: in,
-		dict: make(map[string]int),
+		dict: make(dictionary),
 	}
 
 	return c.encode()
 }
 
 type compressor struct {
-	dict     map[string]int
+	dict     dictionary
 	dictSize int
 
 	data  string
 	start int
 	pos   int
+}
+
+func (c *compressor) String() string {
+	return strconv.Itoa(c.dictSize) + c.dict.String()
 }
 
 func (c *compressor) encode() (str string, err error) {
@@ -31,7 +46,7 @@ func (c *compressor) encode() (str string, err error) {
 		c.ignoreWhitespace()
 		w, err := c.readWord()
 		if err != nil {
-			return archbuff.String(), nil
+			return c.String() + "\n" + archbuff.String(), nil
 		}
 		i := c.addWord(w)
 		archbuff.WriteString(strconv.Itoa(i) + " ")
