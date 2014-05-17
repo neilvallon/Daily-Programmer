@@ -7,15 +7,14 @@ Go-lang implementation of Daily Programmer
 
 ## Results
 
-Test File:
-~60.5MB of lorem ipsum
+#### Size
+| File          | Input Size             | Output Size             | Ratio    |
+| ------------- |:----------------------:|:-----------------------:| -------- |
+| lorem ipsum   | 60,461,999 (~60.5MB)   | 29,603,327 (~29.6MB)    | 48.96%   |
+| green eggs    | 3,458                  | 2,534                   | 73.28%   |
 
-| Input Size    | Output Size   | Ratio    |
-| ------------- |:-------------:| --------:|
-| 60,461,999    | 29,603,327    | 48.96%   |
-
-| Time    | Compression   | Decompression  |
-| ------- |:-------------:| --------------:|
-| real    | 3.626s        | 2.771s         |
-| user    | 3.175s        | 2.351s         |
-| sys     | 0.163s        | 0.161s         |
+#### Speed
+| File          | Compression   | Decompression   |
+| ------------- |:-------------:| ---------------:|
+| lorem ipsum   | 3.626s        | 2.771s          |
+| green eggs    | 0.004s        | 0.004s          |
