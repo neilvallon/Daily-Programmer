@@ -2,7 +2,7 @@
 =================
 
 Go-lang implementation of Daily Programmer
-[challenge 162](http://www.reddit.com/r/dailyprogrammer/comments/25clki/5122014_challenge_162_easy_novel_compression_pt_1/)
+[challenge 162](http://www.reddit.com/r/dailyprogrammer/comments/25o2bd/5162014_challenge_162_hard_novel_compression_pt_3/)
 
 
 ## Results
