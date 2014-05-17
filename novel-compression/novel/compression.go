@@ -14,7 +14,7 @@ func (d dictionary) String() string {
 	for k, v := range d {
 		sarr[v] = k
 	}
-	return strings.Join(sarr, "\n")
+	return strings.Join(sarr, " ")
 }
 
 func Compress(in string) (str string, err error) {
@@ -42,24 +42,28 @@ const (
 )
 
 func (c *compressor) String() string {
-	return strconv.Itoa(c.dictSize) + "\n" + c.dict.String()
+	return strconv.Itoa(c.dictSize) + c.dict.String()
 }
 
 func (c *compressor) encode() (str string, err error) {
 	archbuff := bytes.NewBufferString("")
 
+	lastword := false
 	for {
 		c.ignoreWhitespace()
 		switch b := c.next(); b {
 		case '\n':
-			archbuff.WriteString("R\n")
+			archbuff.WriteByte('R')
+			lastword = false
 		case '!':
 			archbuff.WriteByte(' ')
 			archbuff.WriteByte(b)
+			lastword = false
 		case '.', ',', '?', ';', ':':
 			archbuff.WriteByte(b)
+			lastword = false
 		case '\x00':
-			return c.String() + "\n" + archbuff.String() + "E", nil
+			return c.String() + archbuff.String() + "E", nil
 		default:
 			c.back()
 			w, lc, err := c.readWord()
@@ -67,16 +71,21 @@ func (c *compressor) encode() (str string, err error) {
 				return "", err
 			}
 
+			if lastword {
+				archbuff.WriteByte(' ')
+			}
+
 			i := c.addWord(strings.ToLower(w))
 			archbuff.WriteString(strconv.Itoa(i))
 
+			lastword = false
 			switch lc {
 			case FIRST:
 				archbuff.WriteByte('^')
 			case UPPER:
 				archbuff.WriteByte('!')
 			default:
-				archbuff.WriteByte(' ')
+				lastword = true
 			}
 		}
 	}
