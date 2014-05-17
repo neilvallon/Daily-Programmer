@@ -44,12 +44,18 @@ func (c *compressor) encode() (str string, err error) {
 
 	for {
 		c.ignoreWhitespace()
-		w, err := c.readWord()
-		if err != nil {
-			return c.String() + "\n" + archbuff.String(), nil
+		switch b := c.next(); b {
+		case '.', ',', '?', '!', ';', ':':
+			archbuff.WriteByte(b)
+		default:
+			c.back()
+			w, err := c.readWord()
+			if err != nil {
+				return c.String() + "\n" + archbuff.String(), nil
+			}
+			i := c.addWord(w)
+			archbuff.WriteString(strconv.Itoa(i) + " ")
 		}
-		i := c.addWord(w)
-		archbuff.WriteString(strconv.Itoa(i) + " ")
 	}
 }
 
