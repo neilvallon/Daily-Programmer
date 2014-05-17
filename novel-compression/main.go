@@ -33,13 +33,31 @@ func main() {
 
 	switch {
 	case *comp:
-		panic("Compression not implemented")
+		err := compress(flag.Arg(0), flag.Arg(1))
+		if err != nil {
+			fmt.Println(err)
+		}
 	case *decomp:
 		err := decompress(flag.Arg(0), flag.Arg(1))
 		if err != nil {
 			fmt.Println(err)
 		}
 	}
+}
+
+func compress(inf string, outf string) (err error) {
+	cd, err := ioutil.ReadFile(inf)
+	if err != nil {
+		return
+	}
+
+	data, err := novel.Compress(string(cd))
+	if err != nil {
+		return
+	}
+
+	err = ioutil.WriteFile(outf, []byte(data), 0755)
+	return
 }
 
 func decompress(inf string, outf string) (err error) {
