@@ -15,6 +15,7 @@ func Decompress(in string) (str string, err error) {
 		return
 	}
 
+	d.dictSize = i - 1
 	d.dictionary = make([]string, i)
 	for j := 0; j < i; j++ {
 		d.ignoreWhitespace()
@@ -33,6 +34,7 @@ type decompressor struct {
 	start int
 	pos   int
 
+	dictSize   int
 	dictionary []string
 }
 
@@ -54,6 +56,10 @@ func (d *decompressor) decode() (str string, err error) {
 		case '0' <= b && b <= '9':
 			d.back()
 			i, _ := d.readInt()
+			if i > d.dictSize {
+				return "", fmt.Errorf("Encode number '%d' outside dictonary size", i)
+			}
+
 			word := d.dictionary[i]
 			switch d.next() {
 			case '^':
