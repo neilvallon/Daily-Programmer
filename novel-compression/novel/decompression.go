@@ -46,6 +46,8 @@ func (d *decompressor) decode() (str string, err error) {
 			return sbuff.String(), nil
 		case b == 'R' || b == 'r':
 			sbuff.WriteByte('\n')
+		case b == '-':
+			// ignore
 		case '0' <= b && b <= '9':
 			d.back()
 			i, _ := d.readInt()
@@ -58,12 +60,26 @@ func (d *decompressor) decode() (str string, err error) {
 			default:
 				d.back()
 			}
-			sbuff.WriteString(word + " ")
+			sbuff.WriteString(word + d.nextSeparator())
 		default:
 			fmt.Printf("Skipping byte: %q\n", b)
 		}
 	}
 
+	return
+}
+
+func (d *decompressor) nextSeparator() (c string) {
+	start, pos := d.start, d.pos
+
+	d.ignoreWhitespace()
+	if b := d.next(); b == '-' {
+		c = "-"
+	} else if '0' <= b && b <= '9' {
+		c = " "
+	}
+
+	d.start, d.pos = start, pos
 	return
 }
 
