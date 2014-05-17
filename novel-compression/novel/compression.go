@@ -45,6 +45,8 @@ func (c *compressor) encode() (str string, err error) {
 	for {
 		c.ignoreWhitespace()
 		switch b := c.next(); b {
+		case '\n':
+			archbuff.WriteString("R\n")
 		case '.', ',', '?', '!', ';', ':':
 			archbuff.WriteByte(b)
 		default:
@@ -83,7 +85,7 @@ func (c *compressor) back() {
 }
 
 func (c *compressor) ignoreWhitespace() {
-	for b := c.next(); b == ' ' || b == '\n' || b == '\t'; b = c.next() {
+	for b := c.next(); b == ' ' || b == '\t'; b = c.next() {
 	}
 	c.back()
 	c.start = c.pos
