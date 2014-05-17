@@ -48,6 +48,9 @@ func (d *decompressor) decode() (str string, err error) {
 			sbuff.WriteByte('\n')
 		case b == '-':
 			// ignore
+		case b == '.' || b == ',' || b == '?' || b == '!' || b == ';' || b == ':':
+			sbuff.WriteByte(b) //  . , ? ! ; :
+			sbuff.WriteString(d.nextSeparator())
 		case '0' <= b && b <= '9':
 			d.back()
 			i, _ := d.readInt()
