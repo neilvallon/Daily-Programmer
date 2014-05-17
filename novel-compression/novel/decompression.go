@@ -44,6 +44,8 @@ func (d *decompressor) decode() (str string, err error) {
 	for {
 		d.ignoreWhitespace()
 		switch b := d.next(); {
+		case b == '\x00':
+			return "", fmt.Errorf("EOF")
 		case b == 'E' || b == 'e':
 			return sbuff.String(), nil
 		case b == 'R' || b == 'r':
@@ -93,7 +95,10 @@ func (d *decompressor) nextSeparator() (c string) {
 }
 
 func (d *decompressor) next() (b byte) {
-	b = d.data[d.pos]
+	if d.pos < len(d.data) {
+		b = d.data[d.pos]
+	}
+
 	d.pos++
 	return
 }
