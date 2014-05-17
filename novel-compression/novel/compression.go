@@ -49,11 +49,13 @@ func (c *compressor) encode() (str string, err error) {
 			archbuff.WriteString("R\n")
 		case '.', ',', '?', '!', ';', ':':
 			archbuff.WriteByte(b)
+		case '\x00':
+			return c.String() + "\n" + archbuff.String() + "E", nil
 		default:
 			c.back()
 			w, err := c.readWord()
 			if err != nil {
-				return c.String() + "\n" + archbuff.String(), nil
+				return "", err
 			}
 			i := c.addWord(w)
 			archbuff.WriteString(strconv.Itoa(i) + " ")
